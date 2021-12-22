@@ -1,10 +1,14 @@
 from django.http import HttpResponse
+from django.shortcuts import render
 from django.http.response import Http404
 from django.core import serializers
 from Interactions.models import Interaction
 from django.views.decorators.csrf import csrf_exempt
 
+from .network import create_network
 
+import os
+import time
 import json
 
 
@@ -41,5 +45,8 @@ def get_interaction(request):
         return Http404("Not a valid request")
     else:
         response = Interaction.objects.all()
-        response = serializers.serialize('json', response)
-        return HttpResponse(response)
+        # response = serializers.serialize('json', response)
+        _interactions = list(response.values('sender', 'recipient'))
+        create_network(_interactions)       
+        return render(request, 'Interactions/interactions.html')
+        # return HttpResponse(response.values())
